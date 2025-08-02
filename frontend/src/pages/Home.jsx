@@ -1,9 +1,9 @@
 import MovieCard from "../components/MovieCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { searchMovies, getPopularMovies } from "../services/api";
 import "../css/Home.css";
 
-function Home() {
+function Home({ isOnSearch, setIsOnSearch }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState(null);
@@ -12,6 +12,7 @@ function Home() {
   useEffect(() => {
     const loadPopularMovies = async () => {
       try {
+        if (isOnSearch) return;
         const popularMovies = await getPopularMovies();
         setMovies(popularMovies);
       } catch (err) {
@@ -23,8 +24,9 @@ function Home() {
     };
 
     loadPopularMovies();
-  }, []);
+  }, [isOnSearch]);
 
+  
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return
@@ -34,6 +36,7 @@ function Home() {
     try {
         const searchResults = await searchMovies(searchQuery)
         setMovies(searchResults)
+        setIsOnSearch(true)
         setError(null)
     } catch (err) {
         console.log(err)
